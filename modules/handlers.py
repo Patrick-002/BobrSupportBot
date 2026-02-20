@@ -16,22 +16,28 @@ logger = logging.getLogger(__name__)
 
 class MessageTemplates:
     USER_START = (
-        "👋 Здравствуйте!\n"
-        "Чем можем помочь? Опишите ваш вопрос, и мы скоро ответим.\n\n"
-        "ℹ️ Можете отправлять фото, видео и документы."
+        "👋 Привет!\n"
+        "Если у тебя технический вопрос, напиши сразу:\n"
+        "• сервер или его ip\n"
+        "• устройство на котором неисправности\n"
+        "• кратко опиши на каком этапе возникают неполадки\n\n"
+        "ℹ️ Можешь отправлять фото, видео и документы."
     )
     
     USER_START_EXISTING = (
-        "👋 Здравствуйте!\n"
-        "Чем можем помочь? Опишите ваш вопрос, и мы скоро ответим.\n\n"
-        "ℹ️ Можете отправлять фото, видео и документы."
+        "👋 Снова привет!\n"
+        "Если у тебя технический вопрос, напиши сразу:\n"
+        "• сервер или его ip\n"
+        "• устройство на котором неисправности\n"
+        "• кратко опиши на каком этапе возникают неполадки\n\n"
+        "ℹ️ Можешь отправлять фото, видео и документы."
     )
     
     SUPPORT_USER_INFO = (
-        "ℹ️ Новое обращение от пользователя\n\n"
+        "ℹ️ Новое обращение от любимого клиента\n\n"
         "👤 Имя: {user_name}\n"
         "🆔 ID: {user_id}\n\n"
-        "💬 Ожидайте сообщения от пользователя или начните диалог первым."
+        "💬 Опять работать"
     )
     
     ERROR_CREATION = "❌ Ошибка создания обращения. Попробуйте позже."
@@ -64,6 +70,9 @@ def register_handlers(
     @dp.message(Command("start"), F.chat.type == ChatType.PRIVATE)
     async def cmd_start(message: Message, bot: Bot) -> None:
         if not message.from_user:
+            return
+
+        if await db_manager.is_banned(message.from_user.id):
             return
         
         user_id: int = message.from_user.id
@@ -108,13 +117,58 @@ def register_handlers(
         except Exception as e:
             logger.exception(f"Неизвестная ошибка для user_id={user_id}: {e}")
             await message.answer(MessageTemplates.ERROR_CREATION)
-    
+
+    @dp.message(Command("ban"),F.chat.id == config.support_group_id,F.message_thread_id.as_("thread_id"))
+    async def ban(message: Message, thread_id: int):
+        user_id = await db_manager.get_user_by_topic(thread_id)
+
+        if not user_id:
+            await message.reply("Пользователь не найден")
+            return
+
+        await db_manager.ban_user(user_id)
+        await message.reply(f"Пользователь id:{user_id} забанен))")
+
+        try:
+            await message.bot.send_message(
+                user_id,
+                "⛔ Вы были забанены, gl next)" )
+        except:
+            pass
+
+    @dp.message(Command("unban"),F.chat.id == config.support_group_id,F.message_thread_id.as_("thread_id"))
+    async def ban(message: Message, thread_id: int):
+        user_id = await db_manager.get_user_by_topic(thread_id)
+
+        if not user_id:
+            await message.reply("Пользователь не найден")
+            return
+
+        await db_manager.unban_user(user_id)
+        await message.reply(f"Пользователь id:{user_id} разбанен))")
+
+        try:
+            await message.bot.send_message(
+                user_id,
+                "✅ Тебя помиловали")
+        except:
+            pass
+
     @dp.message(F.chat.type == ChatType.PRIVATE)
     async def handle_user_message(message: Message, bot: Bot) -> None:
         if not message.from_user:
             return
-        
+
         user_id: int = message.from_user.id
+
+        if await db_manager.is_banned(user_id):
+            try:
+                await message.bot.send_message(
+                    user_id,"⛔ Чел ты в бане) ⛔")
+            except:
+                pass
+            return
+
         
         try:
             topic_id: Optional[int] = await db_manager.get_user_topic(user_id)

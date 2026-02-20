@@ -44,7 +44,8 @@ class DatabaseManager:
                         user_id INTEGER PRIMARY KEY,
                         topic_id INTEGER NOT NULL UNIQUE,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        ban INTEGER DEFAULT 0
                     )
                 ''')
                 
@@ -169,7 +170,32 @@ class DatabaseManager:
         except Exception as e:
             logger.error(f"Ошибка удаления топика для user_id={user_id}: {e}")
             raise DatabaseError(f"Ошибка БД: {e}")
-    
+
+    async def ban_user(self, user_id: int) -> None:
+        async with self._get_connection() as conn:
+            await conn.execute(
+                "UPDATE users SET ban = 1 WHERE user_id = ?",
+                (user_id,)
+            )
+            await conn.commit()
+
+    async def unban_user(self, user_id: int) -> None:
+        async with self._get_connection() as conn:
+            await conn.execute(
+                "UPDATE users SET ban = 0 WHERE user_id = ?",
+                (user_id,)
+            )
+            await conn.commit()
+
+    async def is_banned(self, user_id: int) -> bool:
+        async with self._get_connection() as conn:
+            async with conn.execute(
+                    "SELECT ban FROM users WHERE user_id = ?",
+                    (user_id,)
+            ) as cursor:
+                row = await cursor.fetchone()
+                return bool(row["ban"]) if row else False
+
     async def close(self) -> None:
         async with self._lock:
             for conn in self._pool:

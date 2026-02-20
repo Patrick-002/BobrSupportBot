@@ -48,13 +48,13 @@ pip install -r requirements.txt
 **Windows:**
 
 ```bash
-copy example.env .env
+copy .env .env
 ```
 
 **Linux/macOS:**
 
 ```bash
-cp example.env .env
+cp .env .env
 ```
 
 Откройте файл `.env` в текстовом редакторе и заполните его своими данными:
