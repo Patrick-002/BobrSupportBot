@@ -10,79 +10,47 @@
 
 ## Установка
 
-### 1. Клонируйте репозиторий
-
 ```bash
-git clone https://github.com/VladislavKrasnov/TelegramSupportBot.git
+apt-get install git
+```
+```bash
+git clone https://github.com/Patrick-002/BobrSupportBot.git
+```
+```bash
 cd TelegramSupportBot
 ```
-
-### 2. Установите Python
-
-Скачайте и установите Python 3.10 или новее с официального сайта python.org.
-
-### 3. Создайте виртуальное окружение
-
-**Windows:**
 ```bash
-python -m venv venv
-venv\Scripts\activate
+sudo apt update
 ```
-
-**Linux/macOS:**
+```bash
+sudo apt update
+```
+```bash
+sudo apt install python3 python3-pip python3-venv
+```
 ```bash
 python3 -m venv venv
+```
+```bash
 source venv/bin/activate
 ```
-
-### 4. Установите зависимости
-
 ```bash
 pip install -r requirements.txt
 ```
-
-### 5. Настройте бота
-
-Переименуйте файл `example.env` в `.env`:
-
-**Windows:**
-
 ```bash
-copy .env .env
+cp example.env .env
 ```
-
-**Linux/macOS:**
-
-```bash
-cp .env .env
-```
-
 Откройте файл `.env` в текстовом редакторе и заполните его своими данными:
 
 ```env
 BOT_TOKEN=YOUR_TOKEN
 SUPPORT_GROUP_ID=-100xxxxxxxxxx
 ```
-
-**Как получить токен:**
-1. Напишите боту @BotFather в Telegram
-2. Отправьте команду `/newbot`
-3. Следуйте инструкциям и скопируйте токен
-
-**Как получить ID группы:**
-1. Создайте супергруппу в Telegram
-2. В настройках группы включите "Топики"
-3. Добавьте бота в группу как администратора
-4. Откройте группу в десктопном приложении Telegram
-5. Отправьте любое сообщение в группу
-6. Нажмите правой кнопкой на сообщение → "Копировать ссылку на сообщение"
-7. Вы получите ссылку вида: `https://t.me/c/1234567890/1`
-8. Возьмите число после `/c/` и добавьте `-100` в начало: `-1001234567890`
-
-### 6. Запустите бота
-
 ```bash
-python main.py
+apt-get install screen
+```
+```bash
+screen -dmS SupportBt python3 main.py
 ```
 
 Готово! Бот запущен.
