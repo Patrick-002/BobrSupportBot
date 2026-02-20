@@ -23,9 +23,6 @@ cd BobrSupportBot
 sudo apt update
 ```
 ```bash
-sudo apt update
-```
-```bash
 sudo apt install python3 python3-pip python3-venv
 ```
 ```bash
