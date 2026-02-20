@@ -17,7 +17,7 @@ apt-get install git
 git clone https://github.com/Patrick-002/BobrSupportBot.git
 ```
 ```bash
-cd TelegramSupportBot
+cd BobrSupportBot
 ```
 ```bash
 sudo apt update
